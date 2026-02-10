@@ -4,6 +4,8 @@ ifndef::site-gen-antora[:relfileprefix: docs/]
 Collection of playbooks that aim in installing Trento and its
 third-party dependencies.
 
+Small change
+
 == Support matrix
 
 The playbooks can only be run on target nodes running SLES4SAP.
