@@ -167,7 +167,7 @@ jobs:
         with:
           publish: true
           version: ${{ needs.pre-release.outputs.version }}
-          commitish: main
+          commitish: release
           disable-autolabeler: true
           config-name: release_drafter.yaml
         env:
