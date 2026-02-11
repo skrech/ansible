@@ -44,7 +44,7 @@ jobs:
           echo $uuid > ./test_file
 
           # Commit and push a change for `main`
-          git add README.adoc
+          git add ./test_file
           git commit -m "Test $uuid on 'main'"
           git push origin HEAD
 
