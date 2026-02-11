@@ -3,6 +3,12 @@ name: Test hotfix release process
 
 on:
   workflow_dispatch:
+    secrets:
+      RELEASE_KEY:
+        description: >-
+          GitHub deploy key to be used for repository access. The
+          deploy key needs write permissions to the repository.
+        required: true
 
 env:
   GIT_USER: shapbot
@@ -68,8 +74,6 @@ jobs:
           gh pr merge --squash --delete-branch
 
       - name: Make a hotfix release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create PR for hotfix release
           git switch -c pr-minor-release origin/release
@@ -85,20 +89,9 @@ jobs:
           git commit -m "Trigger $new_version release"
           git push origin HEAD
 
-          # Open and merge PR
+      - name: Merge hotfix PR with release key
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_KEY }}
+        run: |
           gh pr create --base release --title "Trigger minor release" --body ""
           gh pr merge --squash --delete-branch
-
-      # GITHUB_TOKEN should be able to trigger other workflows when
-      # started from workflow_dispatch, but maybe because of PR
-      # merging it's not working as expected, thus manually run it.
-      - name: Manual trigger of release workflow
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'release.yaml',
-              ref: 'release',
-            })
