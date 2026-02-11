@@ -87,3 +87,14 @@ jobs:
           # Open and merge PR
           gh pr create --base release --title "Trigger minor release" --body ""
           gh pr merge --squash --delete-branch
+
+      - name: Trigger Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'release.yaml',
+              ref: 'release',
+            })
