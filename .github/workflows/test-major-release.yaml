@@ -1,0 +1,80 @@
+---
+name: Test major release process
+
+on:
+  workflow_dispatch:
+    secrets:
+      MY_GH_PAT:
+        description: >-
+          GitHub deploy key to be used for repository access. The
+          deploy key needs write permissions to the repository.
+        required: true
+
+env:
+  GIT_USER: shapbot
+  GIT_EMAIL: trento-developers@suse.com
+
+jobs:
+  test:
+    name: Setup and test release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup git
+        run: |
+          git config --global user.name "${GIT_USER}"
+          git config --global user.email "${GIT_AUTHOR_EMAIL}"
+
+      - name: Change on `main` branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create a PR branch for `main` branch
+          git switch -c pr-major-change origin/main
+
+          # Make a change
+          uuid=$(uuidgen)
+          echo $uuid > ./test_file
+
+          # Commit and push a change for `main`
+          git add ./test_file
+          git commit -m "Test $uuid on 'main'"
+          git push origin HEAD
+
+          # Open and merge a PR
+          gh pr create --base main --title "Test $uuid on 'main'" --body ""
+          gh pr merge --squash --delete-branch
+
+      - name: Make a major release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create PR for major release
+          git switch -c pr-major-release origin/main
+
+          # Change
+          IFS=. read -r major minor patch < VERSION
+          (( major++ ))
+          new_version="$major.$minor.$patch"
+          echo $new_version > VERSION
+
+          # Commit and push
+          git add VERSION
+          git commit -m "Trigger $new_version release"
+          git push origin HEAD
+
+          # Open and merge PR
+          gh pr create --base main --title "Trigger major release" --body ""
+
+      - name: Merge major PR with PAT
+        env:
+          GH_TOKEN: ${{ secrets.MY_GH_PAT }}
+        run: |
+          gh pr merge --squash --delete-branch

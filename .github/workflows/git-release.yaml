@@ -73,7 +73,11 @@ jobs:
       - name: Commit new changelog
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          branch: main
+          # We need to checkout `branch` explicitly because
+          # `detect-version` messes with the HEAD ref.
+          branch: ${{ inputs.triggering_branch }}
+          skip_fetch: true
+          create_branch: false
           commit_user_name: ${{ env.GIT_USER }}
           commit_user_email: ${{ env.GIT_EMAIL }}
           commit_author: "${{ env.GIT_USER }} <${{ env.GIT_EMAIL }}>"
@@ -163,7 +167,7 @@ jobs:
         with:
           publish: true
           version: ${{ needs.pre-release.outputs.version }}
-          commitish: main
+          commitish: release
           disable-autolabeler: true
           config-name: release_drafter.yaml
         env:
