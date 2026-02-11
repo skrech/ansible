@@ -15,6 +15,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      actions: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v6
@@ -88,7 +89,10 @@ jobs:
           gh pr create --base release --title "Trigger minor release" --body ""
           gh pr merge --squash --delete-branch
 
-      - name: Trigger Workflow
+      # GITHUB_TOKEN should be able to trigger other workflows when
+      # started from workflow_dispatch, but maybe because of PR
+      # merging it's not working as expected, thus manually run it.
+      - name: Manual trigger of release workflow
         uses: actions/github-script@v6
         with:
           script: |
