@@ -1,5 +1,5 @@
 ---
-name: Test hotfix release process
+name: Test major release process
 
 on:
   workflow_dispatch:
@@ -37,14 +37,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create a PR branch for `main` branch
-          git switch -c pr-main-change origin/main
+          git switch -c pr-major-change origin/main
 
           # Make a change
           uuid=$(uuidgen)
           echo $uuid > ./test_file
 
           # Commit and push a change for `main`
-          git add ./test_file
+          git add README.adoc
           git commit -m "Test $uuid on 'main'"
           git push origin HEAD
 
@@ -52,36 +52,16 @@ jobs:
           gh pr create --base main --title "Test $uuid on 'main'" --body ""
           gh pr merge --squash --delete-branch
 
-      - name: Change on `release` branch
+      - name: Make a major release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Create a PR branch for `release` branch
-          git switch -c pr-minor-change origin/release
-
-          # Make a change
-          uuid=$(uuidgen)
-          echo $uuid > ./test_file
-
-          # Commit and push a change for `release`
-          git add ./test_file
-          git commit -m "Test $uuid on 'release'"
-          git push origin HEAD
-
-          # Open and merge a PR
-          gh pr create --base release --title "Test $uuid on 'release'" --body ""
-          gh pr merge --squash --delete-branch
-
-      - name: Make a hotfix release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Create PR for hotfix release
-          git switch -c pr-minor-release origin/release
+          # Create PR for major release
+          git switch -c pr-major-release origin/main
 
           # Change
           IFS=. read -r major minor patch < VERSION
-          (( patch++ ))
+          (( major++ ))
           new_version="$major.$minor.$patch"
           echo $new_version > VERSION
 
@@ -90,10 +70,10 @@ jobs:
           git commit -m "Trigger $new_version release"
           git push origin HEAD
 
-          # Open PR
-          gh pr create --base release --title "Trigger minor release" --body ""
+          # Open and merge PR
+          gh pr create --base main --title "Trigger major release" --body ""
 
-      - name: Merge hotfix PR with PAT
+      - name: Merge major PR with PAT
         env:
           GH_TOKEN: ${{ secrets.MY_GH_PAT }}
         run: |
