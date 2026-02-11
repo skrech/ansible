@@ -62,7 +62,7 @@ jobs:
           # Change
           IFS=. read -r major minor patch < VERSION
           (( major++ ))
-          new_version="$major.$minor.$patch"
+          new_version="$major.0.0"
           echo $new_version > VERSION
 
           # Commit and push
