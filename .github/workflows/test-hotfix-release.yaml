@@ -1,0 +1,59 @@
+---
+name: Test hotfix release process
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Setup and test release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Handle change for `release` branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create a PR branch for `release` branch
+          git switch -c pr-minor-change origin/release
+
+          # Make a change
+          uuid=$(uuidgen)
+          echo $uuid > ./test_file
+
+          # Commit and push a change for `release`
+          git add ./test_file
+          git commit -m "Test $uuid on `release`"
+          git push origin
+
+          # Open and merge a PR
+          gh pr create --base release --title "Test $uuid on `release`" --body ""
+          gh pr merge --squash --delete-branch
+
+      - name: Make a hotfix release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create PR for hotfix release
+          git switch -c pr-minor-release origin/release
+
+          # Change
+          IFS=. read -r major minor patch < VERSION
+          (( patch++ ))
+          new_version="$major.$minor.$patch"
+          echo $new_version > VERSION
+
+          # Commit and push
+          git add VERSION
+          git commit -m "Trigger $new_version release"
+          git push origin
+
+          # Open and merge PR
+          gh pr create --base release --title "Trigger minor release" --body ""
+          gh pr merge --squash --delete-branch
