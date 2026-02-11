@@ -24,7 +24,6 @@ jobs:
         run: |
           git config --global user.name "${GIT_USER}"
           git config --global user.email "${GIT_AUTHOR_EMAIL}"
-          git config --global push.default "simple"
 
       - name: Change on main branch
         env:
@@ -40,7 +39,7 @@ jobs:
           # Commit and push a change for `main`
           git add ./test_file
           git commit -m "Test $uuid on 'main'"
-          git push origin
+          git push origin HEAD
 
           # Open and merge a PR
           gh pr create --base main --title "Test $uuid on 'main'" --body ""
@@ -60,7 +59,7 @@ jobs:
           # Commit and push a change for `release`
           git add ./test_file
           git commit -m "Test $uuid on 'release'"
-          git push origin
+          git push origin HEAD
 
           # Open and merge a PR
           gh pr create --base release --title "Test $uuid on 'release'" --body ""
@@ -82,7 +81,7 @@ jobs:
           # Commit and push
           git add VERSION
           git commit -m "Trigger $new_version release"
-          git push origin
+          git push origin HEAD
 
           # Open and merge PR
           gh pr create --base release --title "Trigger minor release" --body ""
