@@ -4,7 +4,7 @@ name: Test hotfix release process
 on:
   workflow_dispatch:
     secrets:
-      RELEASE_KEY:
+      MY_GH_PAT:
         description: >-
           GitHub deploy key to be used for repository access. The
           deploy key needs write permissions to the repository.
@@ -91,7 +91,7 @@ jobs:
 
       - name: Merge hotfix PR with release key
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_KEY }}
+          GH_TOKEN: ${{ secrets.MY_GH_PAT }}
         run: |
           gh pr create --base release --title "Trigger minor release" --body ""
           gh pr merge --squash --delete-branch
