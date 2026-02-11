@@ -17,6 +17,8 @@ jobs:
           fetch-depth: 0
 
       - name: Change on main branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create a PR branch for `main` branch
           git switch -c pr-main-change origin/main
