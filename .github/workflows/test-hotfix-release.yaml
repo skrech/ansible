@@ -16,7 +16,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Handle change for `release` branch
+      - name: Change on main branch
+        run: |
+          # Create a PR branch for `main` branch
+          git switch -c pr-main-change origin/main
+
+          # Make a change
+          uuid=$(uuidgen)
+          echo $uuid > ./test_file
+
+          # Commit and push a change for `main`
+          git add ./test_file
+          git commit -m "Test $uuid on `main`"
+          git push origin
+
+          # Open and merge a PR
+          gh pr create --base main --title "Test $uuid on `main`" --body ""
+          gh pr merge --squash --delete-branch
+
+      - name: Change on `release` branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
