@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.0.1 - 2026-02-12
+
+### What's Changed
+
+* Trigger minor release (#44) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test cdd51ce7-e568-4ac5-a0c3-7f1524882d8c on 'release' (#43) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test b82da151-9830-4a16-a152-a143b7223f0a on 'release' (#41) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test 831ffd82-493c-46f2-94c5-790279385034 on 'release' (#39) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test 86ca9599-b33b-466b-945e-1f5824bcfd7c on 'release' (#37) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/4.0.0...4.0.1
+
 ## 4.0.0 - 2026-02-12
 
 ### What's Changed
