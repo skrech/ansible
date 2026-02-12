@@ -19,7 +19,6 @@ jobs:
     secrets:
       release_key: ${{ secrets.RELEASE_KEY }}
 
-  # TODO, handle also release branch, if needed
   publish-containers:
     name: Publish GHCR Containers
     uses: ./.github/workflows/publish-containers.yaml
@@ -31,6 +30,7 @@ jobs:
           - ${{ needs.release.outputs.version }}
           - rolling
     with:
+      branch: ${{ github.ref_name }}
       image_name: ansible
       tag: ${{ matrix.tag }}
       dockerfile: "docker/Dockerfile"
