@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.0.0 - 2026-02-12
+
+### What's Changed
+
+* Trigger major release (#35) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test 34fa6eb8-c040-4c31-bea7-b89dcea402b5 on 'main' (#34) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/3.0.2...4.0.0
+
 ## 3.0.2 - 2026-02-11
 
 ### What's Changed
