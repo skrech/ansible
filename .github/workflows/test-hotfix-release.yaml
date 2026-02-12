@@ -76,6 +76,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -x
+
           # Create PR for hotfix release
           git switch -c pr-minor-release origin/release
 
