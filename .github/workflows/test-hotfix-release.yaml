@@ -83,7 +83,7 @@ jobs:
 
           # Change
           IFS=. read -r major minor patch < VERSION
-          (( patch++ ))
+          (( ++patch ))
           new_version="$major.$minor.$patch"
           echo $new_version > VERSION
 
