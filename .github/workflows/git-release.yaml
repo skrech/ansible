@@ -143,7 +143,7 @@ jobs:
       - name: Merge `release` into `main`
         run: |
           git merge origin/release -X ours --no-ff \
-                    -m "Release ${{ needs.pre-release.outputs.version }}" \
+                    -m "Merge Release ${{ needs.pre-release.outputs.version }} into main" \
                     -m "[skip ci]"
 
       - name: Push branch `main`
