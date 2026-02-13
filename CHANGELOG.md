@@ -1,5 +1,14 @@
 # Changelog
 
+## 9.0.0 - 2026-02-13
+
+### What's Changed
+
+* Trigger major release (#66) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test ca3993ba-665f-4120-9a10-9d1384b7247e on 'main' (#65) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/8.0.0...9.0.0
+
 ## 8.0.0 - 2026-02-13
 
 ### What's Changed
