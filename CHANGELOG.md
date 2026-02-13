@@ -1,5 +1,14 @@
 # Changelog
 
+## 9.0.2 - 2026-02-13
+
+### What's Changed
+
+* Trigger minor release (#72) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test 0d0a3596-3b2c-496c-ad50-940162334e3a on 'release' (#71) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/9.0.1...9.0.2
+
 ## 9.0.1 - 2026-02-13
 
 ### What's Changed
