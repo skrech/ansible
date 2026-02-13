@@ -71,7 +71,8 @@ jobs:
           git push origin HEAD
 
           # Open and merge PR
-          gh pr create --base main --title "Trigger major release" --body ""
+          gh pr create --base main --title "Trigger major release" \
+                       --body "" --label skip-release-notes
 
       - name: Merge major PR with PAT
         env:

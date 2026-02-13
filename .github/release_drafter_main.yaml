@@ -36,7 +36,7 @@ version-resolver:
   default: patch
 exclude-labels:
   - skip-release-notes
-  - released-in-hotfix
+  - released-as-hotfix
 filter-by-commitish: true
 template: |
   ## What's Changed
