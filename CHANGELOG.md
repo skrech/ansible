@@ -1,5 +1,15 @@
 # Changelog
 
+## 10.0.1 - 2026-02-13
+
+### What's Changed
+
+* Test d2d06e9b-9aa6-4882-b83f-f5405a0d2f90 on 'release' (#84) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test 6f9033f1-0ab0-4ca6-bb2d-96b1e0655639 on 'release' (#81) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test 60c405c0-c2ad-4000-9e69-c0390810294f on 'release' (#78) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/10.0.0...10.0.1
+
 ## 10.0.0 - 2026-02-13
 
 ### What's Changed
