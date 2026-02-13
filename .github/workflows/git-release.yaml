@@ -59,6 +59,7 @@ jobs:
           publish: false
           version: ${{ steps.detect-version.outputs.current-version }}
           commitish: ${{ inputs.triggering_branch }}
+          filter-by-commitish: ${{ inputs.triggering_branch == 'main' }}
           disable-autolabeler: true
           config-name: release_drafter.yaml
         env:
@@ -167,7 +168,8 @@ jobs:
         with:
           publish: true
           version: ${{ needs.pre-release.outputs.version }}
-          commitish: release
+          commitish: ${{ inputs.triggering_branch }}
+          filter-by-commitish: ${{ inputs.triggering_branch == 'main' }}
           disable-autolabeler: true
           config-name: release_drafter.yaml
         env:
