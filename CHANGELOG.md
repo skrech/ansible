@@ -1,5 +1,14 @@
 # Changelog
 
+## 7.0.1 - 2026-02-13
+
+### What's Changed
+
+* Trigger minor release (#59) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test e796b033-b1e7-4dca-aa81-a31c0248ea9d on 'release' (#58) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/7.0.0...7.0.1
+
 ## 7.0.0 - 2026-02-13
 
 ### What's Changed
