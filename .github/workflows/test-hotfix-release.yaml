@@ -37,7 +37,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create a PR branch for `main` branch
-          git switch -c pr-main-change origin/main
+          git switch -c pr-main-change-norm origin/main
 
           # Make a change
           uuid=$(uuidgen)
@@ -45,11 +45,32 @@ jobs:
 
           # Commit and push a change for `main`
           git add ./test_file
-          git commit -m "Test $uuid on 'main'"
+          git commit -m "Test $uuid on normal 'main'"
           git push origin HEAD
 
           # Open and merge a PR
-          gh pr create --base main --title "Test $uuid on 'main'" --body ""
+          gh pr create --base main --title "Test $uuid on normal 'main'" --body ""
+          gh pr merge --squash --delete-branch
+
+      - name: Change on `main` branch as if hotfix
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create a PR branch for `main` branch
+          git switch -c pr-main-change-hf origin/main
+
+          # Make a change
+          uuid=$(uuidgen)
+          echo $uuid > ./test_file
+
+          # Commit and push a change for `main`
+          git add ./test_file
+          git commit -m "Test $uuid on hotfix 'main'"
+          git push origin HEAD
+
+          # Open and merge a PR
+          gh pr create --base main --title "Test $uuid on hotfix 'main'" \
+                                   --body "" --label released-as-hotfix
           gh pr merge --squash --delete-branch
 
       - name: Change on `release` branch
@@ -69,7 +90,8 @@ jobs:
           git push origin HEAD
 
           # Open and merge a PR
-          gh pr create --base release --title "Test $uuid on 'release'" --body ""
+          gh pr create --base release --title "Test $uuid on 'release'" \
+                       --body "" --label released-as-hotfix
           gh pr merge --squash --delete-branch
 
       - name: Make a hotfix release
@@ -93,7 +115,8 @@ jobs:
           git push origin HEAD
 
           # Open PR
-          gh pr create --base release --title "Trigger minor release" --body ""
+          gh pr create --base release --title "Trigger minor release" \
+                       --body "" --label skip-release-notes
 
       - name: Merge hotfix PR with PAT
         env:
