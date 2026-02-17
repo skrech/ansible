@@ -1,5 +1,14 @@
 # Changelog
 
+## 12.0.0 - 2026-02-17
+
+### What's Changed
+
+* Test 44f2daed-711d-4cbc-bedb-12fb54b3fab2 on 'main' (#92) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test 39b6c4d9-5719-461e-8f93-4a31edf08e76 on normal 'main' (#88) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/11.0.0...12.0.0
+
 ## 11.0.1 - 2026-02-17
 
 ### What's Changed
