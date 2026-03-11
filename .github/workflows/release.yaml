@@ -17,7 +17,8 @@ jobs:
     with:
       triggering_branch: ${{ github.ref_name }}
     secrets:
-      release_key: ${{ secrets.RELEASE_KEY }}
+      gh_token: ${{ secrets.TRENTOBOT_GH_PAT }}
+      ssh_key: ${{ secrets.TRENTOBOT_SSH_KEY }}
 
   publish-containers:
     name: Publish GHCR Containers
@@ -36,6 +37,7 @@ jobs:
       dockerfile: "docker/Dockerfile"
     secrets:
       gh_token: ${{ secrets.TRENTOBOT_GH_PAT }}
+      ssh_key: ${{ secrets.TRENTOBOT_SSH_KEY }}
 
   obs-sync:
     name: Update OBS package (${{ matrix.name }})

@@ -38,7 +38,11 @@ on:
       gh_token:
         description: GitHub Personal Access Token to interact with GH API.
         required: true
-
+      ssh_key:
+        description: >-
+          SSH key to be used for repository access. The key needs
+          write permissions to the repository.
+        required: true
 
 jobs:
   detect-version:
@@ -57,6 +61,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ inputs.branch }}
+          ssh-key: ${{ secrets.ssh_key }}
 
       - name: Get version from git
         id: extract-version
@@ -75,6 +80,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ inputs.branch }}
+          ssh-key: ${{ secrets.ssh_key }}
 
       - uses: docker/setup-buildx-action@v3
 

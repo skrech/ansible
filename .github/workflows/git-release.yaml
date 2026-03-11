@@ -11,12 +11,14 @@ on:
 
     secrets:
       gh_token:
-        description: GitHub Personal Access Token to interact with GH API.
-        required: true
-      release_key:
         description: >-
-          GitHub deploy key to be used for repository access. The
-          deploy key needs write permissions to the repository.
+          GitHub Personal Access Token to interact with GH API. The
+          token needs to have write:package scope.
+        required: true
+      ssh_key:
+        description: >-
+          SSH key to be used for repository access. The key needs
+          write permissions to the repository.
         required: true
 
     outputs:
@@ -40,7 +42,7 @@ jobs:
         with:
           fetch-depth: 2        # required by detect-version step
           ref: ${{ inputs.triggering_branch }}
-          ssh-key: ${{ secrets.release_key }}
+          ssh-key: ${{ secrets.ssh_key }}
 
       - name: Detect new version
         id: detect-version
@@ -98,7 +100,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          ssh-key: ${{ secrets.release_key }}
+          ssh-key: ${{ secrets.ssh_key }}
 
       - name: Setup git
         run: |
@@ -134,7 +136,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          ssh-key: ${{ secrets.release_key }}
+          ssh-key: ${{ secrets.ssh_key }}
 
       - name: Setup git
         run: |
