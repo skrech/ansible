@@ -58,11 +58,12 @@ The nginx configuration acts as a reverse proxy for all the components.
 `server.yml` playbook installs Trento server components (Web and
 Wanda) along with the supporting third-party application dependencies.
 
-This playbook supports auto-discovery of the hosts for RabbitMQ and
-Postgres in Web and Wanda. This feature is enabled when
-`provision_postgres` and `provision_rabbitmq` flags are true. When
-auto-discovery is active, `*_host` variables in `app` role are
-ignored. If you want to use external services for these dependencies,
+This playbook supports auto-discovery of the hosts for RabbitMQ, Postgres and Prometheus
+in Web and Wanda. This feature is enabled when `provision_postgres`,
+`provision_rabbitmq` and `provision_prometheus` flags are true. When
+auto-discovery is active, `*_host` variables (in `trento` role
+and any other role using them) are ignored.
+If you want to use external services for these dependencies,
 turn off the respective flag and specify the `*_host` variable in your
 inventory.
 
@@ -76,6 +77,7 @@ current version):
 * Basesystem Module 15 x86_64 -
 `SUSEConnect -p sle-module-basesystem/15.x/x86_64`
 * SUSE Package Hub 15 x86_64 - `SUSEConnect -p PackageHub/15.x/x86_64`
+* Python 3 module - `SUSEConnect -p sle-module-python3/15.x/x86_64`
 * (15.6 only) Legacy Module 15 x86_64 -
 `SUSEConnect -p sle-module-legacy/15.6/x86_64`
 
@@ -190,6 +192,11 @@ all:
     trento_rabbitmq_password: "guest",
     rproxy_ssl_cert: "<paste your SSL certificate here in base64>",
     rproxy_ssl_key: "<paste your SSL certificate key here in base64>"
+
+    # Prometheus authentication
+    trento_prometheus_auth: "basic"
+    trento_prometheus_auth_username: "prometheus"
+    trento_prometheus_auth_password: "your-prometheus-password"
 ----
 
 === 4. Run the playbooks
@@ -323,6 +330,7 @@ population of some variables.
 
 | provision_prometheus | Whether to provision Prometheus used by Trento to store
   metrics send by agents | true
+
 |===
 
 *Trento meta-role*
@@ -402,6 +410,34 @@ per-role basis if appropriate.
 
 | trento_rabbitmq_vhost | The rabbitmq vhost used for the current
   deployment | "trento"
+
+| trento_prometheus_host | The host where Prometheus is
+  located. Used as input for calculating
+  `trento_prometheus_effective_host` variable that is the default for
+  `*_prometheus_host` variables in some dependent roles.  This variable
+  is ignored when `trento_prometheus_host_group` is non-empty string. |
+  localhost
+
+| trento_prometheus_port | The port where Prometheus is exposed. | 9090
+
+| trento_prometheus_auth | Authentication method for the Prometheus endpoint.
+  Must be "basic" or "none". Shared default for both `rproxy_prometheus_auth`
+  and `agent_prometheus_auth`. | ""
+
+| trento_prometheus_auth_username | Username for Prometheus basic auth.
+  Required when `trento_prometheus_auth` is "basic". | ""
+
+| trento_prometheus_auth_password | Password for Prometheus basic auth.
+  Required when `trento_prometheus_auth` is "basic". | ""
+
+| trento_prometheus_host_group | Name of the host group where Prometheus
+  is located. If this value is not empty string, activates
+  auto-discovery of the Prometheus host by searching it in the specified
+  group. Used as input for calculating
+  `trento_prometheus_effective_host` variable that is the default for
+  `*_prometheus_host` variables in some dependent roles. When
+  auto-discovery is active, the value of `trento_prometheus_host` is
+  ignored. | ""
 |===
 
 *Web role*
@@ -677,6 +713,55 @@ per-role basis if appropriate.
 
 | agent_rabbitmq_vhost | The RabbitMQ virtual host | <value of
   `trento_rabbitmq_vhost`>
+
+| agent_install_monitoring_dep | Whether to install monitoring dependencies like node_exporter or alloy | true
+
+| agent_server_ca_cert | CA certificate of the Trento server, used to verify the
+  server TLS certificate when connecting to it. This is required when ssl termination
+  is enabled on the server side and the TLS is signed by a non-public CA. | undefined
+
+| agent_server_ca_cert_as_base64 | Whether the `agent_server_ca_cert` variable is provided as a
+  base64 string | false
+|===
+
+The following variables drive the monitoring tooling on an agent host.
+
+More detailed info about usage and defaults available link:https://github.com/trento-project/agent/blob/main/packaging/config/agent.yaml[here].
+
+[width="100%",cols="10%,47%,43%",options="header",]
+|===
+|Name | Description | Default
+
+| agent_prometheus_mode | 
+  Whether to use Prometheus in "pull" mode with prometheus node exporters or in "push" mode with grafana alloy. | 
+  If unspecified it resolves to "pull" for SLES \<= 15.7 and "pull" for SLES 16 and above.
+
+| agent_prometheus_exporter_name | 
+  Exporter name used in host discovery. | 
+  "node_exporter" in case of prometheus "pull" mode, "grafana_alloy" in case of "push" mode.
+
+| agent_prometheus_node_exporter_target | 
+  The target address of the node exporter to scrape metrics from, in case `agent_prometheus_mode` is set to "pull". | 
+  Defaults to the lowest discovered IP address with a default port number (9100).
+
+| agent_prometheus_remote_write_url | The remote write URL of the Prometheus server, in case `agent_prometheus_mode` is set to "push". | "https://<value of `trento_server_name`>/prometheus/api/v1/write"
+
+| agent_prometheus_scrape_interval | Scrape interval for Prometheus to scrape the node exporter, in case `agent_prometheus_mode` is set to "push". | "15s"
+
+| agent_prometheus_auth | Authentication method when pushing metrics to Prometheus, in case `agent_prometheus_mode` is set to "push". One of: "none", "basic", "bearer", "mtls" | <value of `trento_prometheus_auth`>
+
+| agent_prometheus_auth_bearer_token | Bearer token used when `agent_prometheus_auth` is set to "bearer". Required if `agent_prometheus_auth` is set to "bearer" | ""
+
+| agent_prometheus_auth_username | Username used when `agent_prometheus_auth` is set to "basic". Required if `agent_prometheus_auth` is set to "basic". | <value of `trento_prometheus_auth_username`>
+
+| agent_prometheus_auth_password | Password used when `agent_prometheus_auth` is set to "basic". Required if `agent_prometheus_auth` is set to "basic". | <value of `trento_prometheus_auth_password`>
+
+| agent_prometheus_tls_ca_cert | CA certificate used to verify the TLS certificate of the Prometheus server, in case `agent_prometheus_mode` is set to "push" and the Prometheus server uses TLS. This is required when the Prometheus server TLS certificate is signed by a non-public CA. | ""
+
+| agent_prometheus_tls_client_cert | Client certificate used for mTLS authentication when `agent_prometheus_auth` is set to "mtls". Required if `agent_prometheus_auth` is set to "mtls". | ""
+
+| agent_prometheus_tls_client_key | Client key used for mTLS authentication when `agent_prometheus_auth` is set to "mtls". Required if `agent_prometheus_auth` is set to "mtls". | ""
+
 |===
 
 *Postgres role*
@@ -723,6 +808,9 @@ per-role basis if appropriate.
 
 | prometheus_web_listen_port | Port on which Web is exposed, to be
   scraped by Prometheus | <value of `trento_web_listen_port`>
+
+| prometheus_enable_remote_write_receiver | Whether to start Prometheus with remote write receiver enabled.
+  Adds support for hosts with Grafana Alloy | true
 |===
 
 *RabbitMQ role*
@@ -785,6 +873,23 @@ per-role basis if appropriate.
 
 | rproxy_ssl_key_as_base64 | Whether SSL key is provided as base64
   string | false
+
+| rproxy_provision_prometheus | Whether to provision Prometheus
+  proxy configuration in the reverse proxy | false
+
+| rproxy_prometheus_auth | Authentication method for the Prometheus reverse proxy endpoint.
+  Must be set to "basic" or "none" when `rproxy_provision_prometheus` is true. | <value of `trento_prometheus_auth`>
+
+| rproxy_prometheus_auth_username | Username for Prometheus basic auth.
+  Required when `rproxy_prometheus_auth` is "basic". | <value of `trento_prometheus_auth_username`>
+
+| rproxy_prometheus_auth_password | Password for Prometheus basic auth.
+  Required when `rproxy_prometheus_auth` is "basic". | <value of `trento_prometheus_auth_password`>
+
+| rproxy_prometheus_host | The host where Prometheus is located. | <value of `trento_prometheus_effective_host`>
+
+| rproxy_prometheus_port | The port where Prometheus is exposed. | <value of `trento_prometheus_port`>
+
 |===
 
 == Clean up
