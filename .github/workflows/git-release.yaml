@@ -31,8 +31,6 @@ env:
 jobs:
   pre-release:
     name: Prepare a release
-    permissions:
-      contents: write
     runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.detect-version.outputs.current-version }}
@@ -154,8 +152,6 @@ jobs:
 
   release:
     name: Tag and publish release
-    permissions:
-      contents: write
     runs-on: ubuntu-24.04
     needs: [pre-release, cross-merge-branches, hotfix-merge-branches]
     # Hack: Implement poor man's "either or" logic for `needs`.

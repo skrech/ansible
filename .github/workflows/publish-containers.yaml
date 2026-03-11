@@ -68,9 +68,6 @@ jobs:
     name: Build and push
     needs: [detect-version]
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      packages: write
     env:
       IMAGE_REPOSITORY: ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image_name }}
     steps:
