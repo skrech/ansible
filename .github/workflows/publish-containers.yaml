@@ -34,6 +34,12 @@ on:
           building the container. Value should be new-line delimited
           string.
 
+    secrets:
+      gh_token:
+        description: GitHub Personal Access Token to interact with GH API.
+        required: true
+
+
 jobs:
   detect-version:
     name: Detect version
@@ -80,7 +86,7 @@ jobs:
         with:
           registry: ${{ inputs.registry }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.gh_token }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta

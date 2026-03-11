@@ -10,6 +10,9 @@ on:
         description: The branch on which we received a release request.
 
     secrets:
+      gh_token:
+        description: GitHub Personal Access Token to interact with GH API.
+        required: true
       release_key:
         description: >-
           GitHub deploy key to be used for repository access. The
@@ -62,7 +65,7 @@ jobs:
           version: ${{ steps.detect-version.outputs.current-version }}
           disable-autolabeler: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
 
       - name: Update CHANGELOG.md
         uses: stefanzweifel/changelog-updater-action@v1
@@ -171,4 +174,4 @@ jobs:
           version: ${{ needs.pre-release.outputs.version }}
           disable-autolabeler: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
