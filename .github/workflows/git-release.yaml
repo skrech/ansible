@@ -10,10 +10,18 @@ on:
         description: The branch on which we received a release request.
 
     secrets:
-      release_key:
+      gh_token:
         description: >-
-          GitHub deploy key to be used for repository access. The
-          deploy key needs write permissions to the repository.
+          GitHub Personal Access Token to interact with GH API. The
+          token needs to have write:package scope.
+        required: true
+      ssh_key:
+        description: >-
+          SSH key to be used for repository access. The key needs
+          write permissions to the repository.
+        required: true
+      gpg_key:
+        description: GPG private key used for signing.
         required: true
 
     outputs:
@@ -21,15 +29,13 @@ on:
         value: ${{ jobs.pre-release.outputs.version }}
         description: "The determined version of the release"
 
-env:
-  GIT_USER: shapbot
-  GIT_EMAIL: trento-developers@suse.com
+# env:
+#   GIT_USER: trentobot
+#   GIT_EMAIL: trentobot@suse.com
 
 jobs:
   pre-release:
     name: Prepare a release
-    permissions:
-      contents: write
     runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.detect-version.outputs.current-version }}
@@ -39,7 +45,7 @@ jobs:
         with:
           fetch-depth: 2        # required by detect-version step
           ref: ${{ inputs.triggering_branch }}
-          ssh-key: ${{ secrets.release_key }}
+          ssh-key: ${{ secrets.ssh_key }}
 
       - name: Detect new version
         id: detect-version
@@ -62,13 +68,21 @@ jobs:
           version: ${{ steps.detect-version.outputs.current-version }}
           disable-autolabeler: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
 
       - name: Update CHANGELOG.md
         uses: stefanzweifel/changelog-updater-action@v1
         with:
           latest-version: ${{ steps.detect-version.outputs.current-version }}
           release-notes: ${{ steps.draft-release.outputs.body }}
+
+      - name: Import GPG key
+        id: import-gpg
+        uses: crazy-max/ghaction-import-gpg@v7
+        with:
+          gpg_private_key: ${{ secrets.gpg_key }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
 
       - name: Commit new changelog
         uses: stefanzweifel/git-auto-commit-action@v7
@@ -78,9 +92,9 @@ jobs:
           branch: ${{ inputs.triggering_branch }}
           skip_fetch: true
           create_branch: false
-          commit_user_name: ${{ env.GIT_USER }}
-          commit_user_email: ${{ env.GIT_EMAIL }}
-          commit_author: "${{ env.GIT_USER }} <${{ env.GIT_EMAIL }}>"
+          commit_user_name: ${{ steps.import-gpg.outputs.name }}
+          commit_user_email: ${{ steps.import-gpg.outputs.email }}
+          commit_author: "${{ steps.import-gpg.outputs.name }} <${{ steps.import-gpg.outputs.email }}>"
           commit_message: |
             Automatically update CHANGELOG.md for release ${{ steps.detect-version.outputs.current-version }}
 
@@ -97,12 +111,20 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          ssh-key: ${{ secrets.release_key }}
+          ssh-key: ${{ secrets.ssh_key }}
 
-      - name: Setup git
-        run: |
-          git config --global user.name "${GIT_USER}"
-          git config --global user.email "${GIT_EMAIL}"
+      - name: Import GPG key
+        id: import-gpg
+        uses: crazy-max/ghaction-import-gpg@v7
+        with:
+          gpg_private_key: ${{ secrets.gpg_key }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      # - name: Setup git
+      #   run: |
+      #     git config --global user.name "${GIT_USER}"
+      #     git config --global user.email "${GIT_EMAIL}"
 
       - name: Switch to 'release' branch
         run: git switch release 2>/dev/null || git switch -c release main
@@ -133,12 +155,20 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          ssh-key: ${{ secrets.release_key }}
+          ssh-key: ${{ secrets.ssh_key }}
 
-      - name: Setup git
-        run: |
-          git config --global user.name "${GIT_USER}"
-          git config --global user.email "${GIT_EMAIL}"
+      - name: Import GPG key
+        id: import-gpg
+        uses: crazy-max/ghaction-import-gpg@v7
+        with:
+          gpg_private_key: ${{ secrets.gpg_key }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      # - name: Setup git
+      #   run: |
+      #     git config --global user.name "${GIT_USER}"
+      #     git config --global user.email "${GIT_EMAIL}"
 
       - name: Merge `release` into `main`
         run: |
@@ -151,8 +181,6 @@ jobs:
 
   release:
     name: Tag and publish release
-    permissions:
-      contents: write
     runs-on: ubuntu-24.04
     needs: [pre-release, cross-merge-branches, hotfix-merge-branches]
     # Hack: Implement poor man's "either or" logic for `needs`.
@@ -171,4 +199,4 @@ jobs:
           version: ${{ needs.pre-release.outputs.version }}
           disable-autolabeler: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
