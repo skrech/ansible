@@ -19,6 +19,7 @@ jobs:
     secrets:
       gh_token: ${{ secrets.TRENTOBOT_GH_PAT }}
       ssh_key: ${{ secrets.TRENTOBOT_SSH_KEY }}
+      gpg_key: ${{ secrets.TRENTOBOT_GPG_KEY }}
 
   publish-containers:
     name: Publish GHCR Containers

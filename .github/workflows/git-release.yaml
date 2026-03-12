@@ -20,15 +20,18 @@ on:
           SSH key to be used for repository access. The key needs
           write permissions to the repository.
         required: true
+      gpg_key:
+        description: GPG private key used for signing.
+        required: true
 
     outputs:
       version:
         value: ${{ jobs.pre-release.outputs.version }}
         description: "The determined version of the release"
 
-env:
-  GIT_USER: shapbot
-  GIT_EMAIL: trento-developers@suse.com
+# env:
+#   GIT_USER: trentobot
+#   GIT_EMAIL: trentobot@suse.com
 
 jobs:
   pre-release:
@@ -73,6 +76,14 @@ jobs:
           latest-version: ${{ steps.detect-version.outputs.current-version }}
           release-notes: ${{ steps.draft-release.outputs.body }}
 
+      - name: Import GPG key
+        id: import-gpg
+        uses: crazy-max/ghaction-import-gpg@v7
+        with:
+          gpg_private_key: ${{ secrets.gpg_key }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Commit new changelog
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
@@ -81,9 +92,9 @@ jobs:
           branch: ${{ inputs.triggering_branch }}
           skip_fetch: true
           create_branch: false
-          commit_user_name: ${{ env.GIT_USER }}
-          commit_user_email: ${{ env.GIT_EMAIL }}
-          commit_author: "${{ env.GIT_USER }} <${{ env.GIT_EMAIL }}>"
+          commit_user_name: ${{ steps.import-gpg.outputs.name }}
+          commit_user_email: ${{ steps.import-gpg.outputs.email }}
+          commit_author: "${{ steps.import-gpg.outputs.name }} <${{ steps.import-gpg.outputs.email }}>"
           commit_message: |
             Automatically update CHANGELOG.md for release ${{ steps.detect-version.outputs.current-version }}
 
@@ -102,10 +113,18 @@ jobs:
           ref: main
           ssh-key: ${{ secrets.ssh_key }}
 
-      - name: Setup git
-        run: |
-          git config --global user.name "${GIT_USER}"
-          git config --global user.email "${GIT_EMAIL}"
+      - name: Import GPG key
+        id: import-gpg
+        uses: crazy-max/ghaction-import-gpg@v7
+        with:
+          gpg_private_key: ${{ secrets.gpg_key }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      # - name: Setup git
+      #   run: |
+      #     git config --global user.name "${GIT_USER}"
+      #     git config --global user.email "${GIT_EMAIL}"
 
       - name: Switch to 'release' branch
         run: git switch release 2>/dev/null || git switch -c release main
@@ -138,10 +157,18 @@ jobs:
           ref: main
           ssh-key: ${{ secrets.ssh_key }}
 
-      - name: Setup git
-        run: |
-          git config --global user.name "${GIT_USER}"
-          git config --global user.email "${GIT_EMAIL}"
+      - name: Import GPG key
+        id: import-gpg
+        uses: crazy-max/ghaction-import-gpg@v7
+        with:
+          gpg_private_key: ${{ secrets.gpg_key }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      # - name: Setup git
+      #   run: |
+      #     git config --global user.name "${GIT_USER}"
+      #     git config --global user.email "${GIT_EMAIL}"
 
       - name: Merge `release` into `main`
         run: |
