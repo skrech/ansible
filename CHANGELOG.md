@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.0.1 - 2026-03-12
+
+### What's Changed
+
+* Test 8cc6ee46-bb39-41a1-a528-232265920590 on 'release' (#104) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/5.0.0...5.0.1
+
 ## 5.0.0 - 2026-03-12
 
 ### What's Changed
