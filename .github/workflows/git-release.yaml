@@ -135,7 +135,9 @@ jobs:
         run: git merge release --ff-only
 
       - name: Make a tag
-        run: git tag ${{ needs.pre-release.outputs.version }}
+        env:
+          TAG: ${{ needs.pre-release.outputs.version }}
+        run: git tag "$TAG" -m "Release $TAG"
 
       - name: Push branches `main` and `release`
         run: git push origin main release ${{ needs.pre-release.outputs.version }}
@@ -163,7 +165,9 @@ jobs:
           git_tag_gpgsign: true
 
       - name: Make a tag
-        run: git tag ${{ needs.pre-release.outputs.version }}
+        env:
+          TAG: ${{ needs.pre-release.outputs.version }}
+        run: git tag "$TAG" -m "Release $TAG"
 
       - name: Switch to `main`
         run: git switch main
