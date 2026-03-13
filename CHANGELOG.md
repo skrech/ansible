@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.0.0 - 2026-03-13
+
+### What's Changed
+
+* Test 940aac66-c1c2-44d1-91a7-d3945c828602 on 'main' (#106) @[github-actions[bot]](https://github.com/apps/github-actions)
+* Test f28fed59-772e-4300-9d4c-c881c1091d93 on normal 'main' (#102) @[github-actions[bot]](https://github.com/apps/github-actions)
+
+**Full Changelog**: https://github.com/skrech/ansible/compare/5.0.0...6.0.0
+
 ## 5.0.1 - 2026-03-12
 
 ### What's Changed
